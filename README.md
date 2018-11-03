@@ -1,4 +1,53 @@
 ## 30 seconds of code中所有函数解读 (慢慢补充中...)
+#### filterNonUniqueBy函数
+>原文解释：
+>Filters out the non-unique values in an array, based on a provided comparator function.Use Array.prototype.filter() and Array.prototype.every() for an array containing only the unique values, based on the comparator function, fn. The comparator function takes four arguments: the values of the two elements being compared and their indexes.
+>
+>翻译结果：
+>根据提供的comparator函数，过滤掉数组中的非唯一值。使用array .prototype.filter()和array .prototype. each()来处理基于comparator函数fn的只包含唯一值的数组。comparator函数有四个参数:比较两个元素的值及其索引。
+```
+const filterNonUniqueBy = (arr, fn) =>
+  arr.filter((v, i) => arr.every((x, j) => (i === j) === fn(v, x, i, j)));
+filterNonUniqueBy(
+  [
+    { id: 0, value: 'a' },
+    { id: 1, value: 'b' },
+    { id: 2, value: 'c' },
+    { id: 1, value: 'd' },
+    { id: 0, value: 'e' }
+  ],
+  (a, b) => a.id == b.id
+); // [ { id: 2, value: 'c' } ]
+```
+以`filterNonUniqueBy(
+  [
+    { id: 0, value: 'a' },
+    { id: 1, value: 'b' },
+    { id: 2, value: 'c' },
+    { id: 1, value: 'd' },
+    { id: 0, value: 'e' }
+  ],
+  (a, b) => a.id == b.id
+);`为例进行解读：
+
+ 1. 该函数使用了两个函数，filter函数和every函数。
+ 2. 首先当`v = { id: 0, value: 'a' }, i = 0`时，表达式变为`arr.filter(({ id: 0, value: 'a' },0) => arr.every((x,j) => (0 === j) === fn({ id: 0, value: 'a' },x,0,j)))`，此时执行j = 0到j = 4的函数表达式`arr.every((x,j) => (0 === j) === fn({ id: 0, value: 'a' },x,0,j)))`,看它返回true还是false，因为fn中执行的函数回调，所以当j!=0时一定会出现`a.id = b.id`的情况，所以只要数组的对象中存在重复的id值，那么arr.eveny一定会返回false。因此排除了除`v = { id: 2, value: 'c' }`以外的所有情况。现在看当`v = { id: 2, value: 'c' }`时的情况，此时i的值为2，且表达式变为`arr.filter(({ id: 2, value: 'c' },2) => arr.every((x,j) => (i === j) === fn({ id: 2, value: 'c' },x,i,j)))`,来看表达式的这一部分`(2 === j) === fn({ id: 2, value: 'c' },x,2,j))`,当j从0-4发生变化时，该表达式返回的值肯定是true，所以最后只有当i = 2时，filter的回调函数才满足，其余情况下的对象都被过滤了，只剩下了不重复id的对象`{ id: 2, value: 'c' }`。
+
+#### findLast函数
+>原文解释：
+>Returns the last element for which the provided function returns a truthy value.Use Array.prototype.filter() to remove elements for which fn returns falsey values, Array.prototype.pop() to get the last one.
+>
+>翻译结果：
+>返回提供的函数为其返回一个真实值的最后一个元素。使用Array.prototype.filter()删除fn返回falsey值的元素。
+```
+const findLast = (arr, fn) => arr.filter(fn).pop();
+findLast([1, 2, 3, 4], n => n % 2 === 1); // 3
+```
+以`findLast([1, 2, 3, 4], n => n % 2 === 1);`为例进行解读：
+
+ 1. 该函数只用到了两个函数，filter函数和pop函数。
+ 2. 首先使用filter函数过滤了不满足条件`n => n % 2 === 1`的数组元素得到数组`[1,3]`，然后使用pop函数提取出了末尾数组元素3。
+
 #### findLastIndex函数
 >原文解释：
 >Returns the index of the last element for which the provided function returns a truthy value.Use Array.prototype.map() to map each element to an array with its index and value. Use Array.prototype.filter() to remove elements for which fn returns falsey values, Array.prototype.pop() to get the last one.
