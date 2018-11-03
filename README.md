@@ -1,5 +1,23 @@
 ## 30 seconds of code中所有函数解读 (慢慢补充中...)
 
+#### flatten函数
+>原文解释：
+>Flattens an array up to the specified depth.Use recursion, decrementing depth by 1 for each level of depth. Use Array.prototype.reduce() and Array.prototype.concat() to merge elements or arrays. Base case, for depth equal to 1 stops recursion. Omit the second argument, depth to flatten only to a depth of 1 (single flatten).
+>
+>翻译结果：
+>将阵列压平至指定深度。使用递归，每层深度减1。使用Array.prototype.reduce()和Array.prototype.concat()合并元素或数组。基本情况，深度为1时停止递归。忽略第二个参数，深度要压平的深度仅为1(单个压平)。
+```
+const flatten = (arr, depth = 1) =>
+  arr.reduce((a, v) => 
+	  a.concat(depth > 1 && Array.isArray(v) ? flatten(v, depth - 1) : v), []);
+flatten([1, [2], 3, 4]); // [1, 2, 3, 4]
+flatten([1, [2, [3, [4, 5], 6], 7], 8], 2); // [1, 2, 3, [4, 5], 6, 7, 8]
+```
+以`flatten([1, [2, [3, [4, 5], 6], 7], 8], 2);`为例进行解读：
+
+ 1. 这个函数整体使用了递归的思想，直到函数中的某些条件符合不再进行递归处理。
+ 2. 现在传入的arr值是`[1, [2, [3, [4, 5], 6], 7], 8]`，depth的值是2，此时条件`depth > 1 && Array.isArray(v) ? flatten(v, depth - 1) : v`执行到`v = [2, [3, [4, 5], 6], 7]`时结果是递归调用`depth > 1 && Array.isArray(v) ? flatten(v, depth - 1) : v`,当这里的`v = [3, [4, 5], 6]`时继续递归调用`depth > 1 && Array.isArray(v) ? flatten(v, depth - 1) : v`,当这里的`v = [4, 5]`时不再执行递归调用，而是返回该数组。因为此时的depth = 1，所以程序执行到这结束，除了数组`[4, 5]`没被处理即原样返回，其余的都被处理为单个数组元素。
+
 #### forEachRight函数
 >原文解释：
 >Executes a provided function once for each array element, starting from the array's last element.Use Array.prototype.slice(0) to clone the given array, Array.prototype.reverse() to reverse it and Array.prototype.forEach() to iterate over the reversed array.
@@ -40,4 +58,4 @@ groupBy(['one', 'two', 'three'], 'length'); // {3: ['one', 'two'], 5: ['three']}
 
 2. `arr.map(typeof fn === 'function' ? fn : val => val[fn])`的map函数中传入的fn是`Math.floor`，因为`typeof fn === 'function'`的结果是true，所以`arr.map`的结果是`arr.map(Math.floor)`，这句话就是将原来的arr数据中的每个元素都`Math.floor`一遍然后所得的结果将是`[6, 4, 6]`。
 
-3. `reduce((acc, val, i) => { acc[val] = (acc[val] || []).concat(arr[i]); return acc; }, {}); `这其实是一个求和函数，这里传入了一个起始的值`{}`是一个空对象，其实目的很简单就是为了给空的对象添加新的key，因为整个函数的本意是用来归类合并具有相同性质的数组元素，第一个调用示例`groupBy([6.1, 4.2, 6.3], Math.floor)`就是归类合并向下取整后的数组元素；第二个调用示例`groupBy(['one', 'two', 'three'], 'length')`就是归类合并具有相同字符长度的数组元素。`acc[val] = (acc[val] || []).concat(arr[i])`这句话的意思是给刚才传入的空`{}`在现有的基础上新建key并赋值`[]`或者覆盖已有的key所对应的数组。当遍历到的val是第一个元素6时`acc[6] = (acc[6] || []).concat(arr[0])`所得的结果是`{"6": [6.1]}`;当遍历到的val的第二个元素4时`acc[4] = (acc[4] || []).concat(arr[1])`所得的结果是`{"6": [6.1],"4": [4.2]}`;当传入的值是第三个元素6时`acc[6] = (acc[6] || []).concat(arr[2])`所得的结果是`{"4": [4.2],"6": [6.1,6.3]}`
+3. `reduce((acc, val, i) => { acc[val] = (acc[val] || []).concat(arr[i]); return acc; }, {}); `这其实是一个求和函数，这里传入了一个起始的值`{}`是一个空对象，其实目的很简单就是为了给空的对象添加新的key，因为整个函数的本意是用来归类合并具有相同性质的数组元素，第一个调用示例`groupBy([6.1, 4.2, 6.3], Math.floor)`就是归类合并向下取整后的数组元素；第二个调用示例`groupBy(['one', 'two', 'three'], 'length')`就是归类合并具有相同字符长度的数组元素。`acc[val] = (acc[val] || []).concat(arr[i])`这句话的意思是给刚才传入的空`{}`在现有的基础上新建key并赋值`[]`或者覆盖已有的key所对应的数组。当遍历到的val是第一个元素6时`acc[6] = (acc[6] || []).concat(arr[0])`所得的结果是`{"6": [6.1]}`;当遍历到的val的第二个元素4时`acc[4] = (acc[4] || []).concat(arr[1])`所得的结果是`{"6": [6.1],"4": [4.2]}`;当传入的值是第三个元素6时`acc[6] = (acc[6] || []).concat(arr[2])`所得的结果是`{"4": [4.2],"6": [6.1,6.3]}`。
