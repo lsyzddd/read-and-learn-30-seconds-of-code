@@ -1,4 +1,22 @@
 ## 30 seconds of code中所有函数解读 (慢慢补充中...)
+#### findLastIndex函数
+>原文解释：
+>Returns the index of the last element for which the provided function returns a truthy value.Use Array.prototype.map() to map each element to an array with its index and value. Use Array.prototype.filter() to remove elements for which fn returns falsey values, Array.prototype.pop() to get the last one.
+>
+>翻译结果：
+>返回最后一个元素的索引，提供的函数为该元素返回一个真实值。使用array .prototype.map()将每个元素映射到一个具有索引和值的数组。使用Array.prototype.filter()删除fn返回falsey值的元素。
+```
+const findLastIndex = (arr, fn) =>
+  arr
+    .map((val, i) => [i, val])
+    .filter(([i, val]) => fn(val, i, arr))
+    .pop()[0];
+findLastIndex([1, 2, 3, 4], n => n % 2 === 1); // 2 (index of the value 3)
+```
+以`findLastIndex([1, 2, 3, 4], n => n % 2 === 1);`为例进行解读：
+
+ 1. 该函数用到了三个函数，map函数回调处理数组中的所有元素，并按照回调中的规则返回相应的键值对;filter函数利用回调函数过滤掉不符合要求的数据项;pop函数将删除原先数组的最后一个元素并返回。
+ 2. 首先利用map函数先把原先的数组格式化为`[[0,1],[1,2],[2,3],[3,4]]`意思是把原先的元素处理成`[元素的索引,元素]`的形式，然后使用filter函数中的回调函数`n => n % 2 === 1`过滤出`[[0,1],[2,3]]`，最后使用pop函数提取出数组[2,3]，并返回第一个元素值3对应的索引值2`(index of the value 3)`。
 
 #### flatten函数
 >原文解释：
@@ -9,7 +27,7 @@
 ```
 const flatten = (arr, depth = 1) =>
   arr.reduce((a, v) => 
-	  a.concat(depth > 1 && Array.isArray(v) ? flatten(v, depth - 1) : v), []);
+  a.concat(depth > 1 && Array.isArray(v) ? flatten(v, depth - 1) : v), []);
 flatten([1, [2], 3, 4]); // [1, 2, 3, 4]
 flatten([1, [2, [3, [4, 5], 6], 7], 8], 2); // [1, 2, 3, [4, 5], 6, 7, 8]
 ```
