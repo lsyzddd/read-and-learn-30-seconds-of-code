@@ -1,4 +1,73 @@
 ## 30 seconds of code中所有函数解读 (慢慢补充中...)
+#### chunk函数
+>原文解释：
+>Chunks an array into smaller arrays of a specified size.Use Array.from() to create a new array, that fits the number of chunks that will be produced. Use Array.prototype.slice() to map each element of the new array to a chunk the length of size. If the original array can't be split evenly, the final chunk will contain the remaining elements.
+>
+>翻译结果：
+>将数组分成指定大小的较小数组。使用array .from()来创建一个新的数组，它与将要生成的块数量相匹配。使用array .prototype.slice()将新数组的每个元素映射到大小为块的块。如果原始数组不能被平均分割，那么最后的块将包含其余的元素。
+```
+const chunk = (arr, size) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+chunk([1, 2, 3, 4, 5], 2); // [[1,2],[3,4],[5]]
+```
+以`chunk([1, 2, 3, 4, 5], 2);`为例进行解读：
+
+ 1. 该函数使用了Array.from函数创建数组对象和slice截取函数。
+ 2. 首先看到Array.from中`{ length: Math.ceil(arr.length / size) }`表明了一个维数组对象，意思是要创建一个长度为3的数组，`arr.slice(i * size, i * size + size)`这句话其实是：将数组中的每个数组元素创建为，从原数组中每截取两个元素组成新数组，将这些新数组变为数组元素然后返回。
+
+
+#### compact函数
+>原文解释：
+>Removes falsey values from an array.Use Array.prototype.filter() to filter out falsey values (false, null, 0, "", undefined, and NaN).
+>
+>翻译结果：
+>从数组中删除falsey值。使用Array.prototype.filter()来过滤掉falsey值(false、null、0、""、undefined和NaN)。
+```
+const compact = arr => arr.filter(Boolean);
+compact([0, 1, false, 2, '', 3, 'a', 'e' * 23, NaN, 's', 34]); // [ 1, 2, 3, 'a', 's', 34 ]
+```
+以`compact([0, 1, false, 2, '', 3, 'a', 'e' * 23, NaN, 's', 34]);`为例进行解读：
+
+ 1. 这个函数返回布尔值为true的元素，其中false、null、0、""、undefined和NaN的布尔值为false。
+
+#### countBy函数
+>原文解释：
+>Groups the elements of an array based on the given function and returns the count of elements in each group.Use Array.prototype.map() to map the values of an array to a function or property name. Use Array.prototype.reduce() to create an object, where the keys are produced from the mapped results.
+>
+>翻译结果：
+>根据给定的函数对数组的元素进行分组，并返回每组元素的计数。使用array .prototype.map()将数组的值映射到函数或属性名。使用Array.prototype.reduce()创建一个对象，其中键是根据映射的结果生成的。
+```
+const countBy = (arr, fn) =>
+  arr.map(typeof fn === 'function' ? fn : val => val[fn]).reduce((acc, val) => {
+    acc[val] = (acc[val] || 0) + 1;
+    return acc;
+  }, {});
+countBy([6.1, 4.2, 6.3], Math.floor); // {4: 1, 6: 2}
+countBy(['one', 'two', 'three'], 'length'); // {3: 2, 5: 1}
+```
+以`countBy([6.1, 4.2, 6.3], Math.floor);`为例进行解读：
+
+ 1. 该函数使用了map函数进行格式化和reduce函数进行求和。
+ 2. 首先看到函数`typeof fn === 'function' ? fn : val => val[fn]`，因为传入的fn是Math.floor所以`arr.map`返回的是数组`[6, 4, 6]`。然后调用了reduce函数，函数的回调内容是`acc[val] = (acc[val] || 0) + 1`，它的意思是当初始化的空对象中如果不存在对应的键值对时就创建为0并加1，如果存在的话就在原先的基础上加一，这里的用法`(acc[val] || 0) + 1`使得语言更加自然，因为不存在的话就是0，不管存不存在都存在一个初始值，那就是0或者原先的值。
+
+#### countOccurrences函数
+>原文解释：
+>Counts the occurrences of a value in an array.Use Array.prototype.reduce() to increment a counter each time you encounter the specific value inside the array.
+>
+>翻译结果：
+>计数数组中出现的值。每次在数组中遇到特定值时，使用array. prototype.reduce()增加计数器的值。
+```
+const countOccurrences = (arr, val) => 
+  arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+countOccurrences([1, 1, 2, 1, 2, 3], 1); // 3
+```
+以`countOccurrences([1, 1, 2, 1, 2, 3], 1);`为例进行解读：
+
+ 1. 该函数使用了reduce函数进行求和三元表达式。
+ 2. 这里数组`[1, 1, 2, 1, 2, 3]`被传了进去，,因为reduce函数的最后传了0，所以该函数的求和初值是0。由于val的值是1，再加上判断表达式`v === val ? a + 1 : a`可得一旦检测到数组中有元素等于0，那么求和的值就会加1，所以最后统计出数组中共有3个1。
+
 #### deepFlatten函数
 >原文解释：
 >Deep flattens an array.Use recursion. Use Array.prototype.concat() with an empty array ([]) and the spread operator (...) to flatten an array. Recursively flatten each element that is an array.
