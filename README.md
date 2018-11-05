@@ -1,4 +1,102 @@
 ## 30 seconds of code中所有函数解读 (慢慢补充中...)
+## Array
+#### all函数
+>原文解释：
+>Returns true if the provided predicate function returns true for all elements in a collection, false otherwise.Use Array.prototype.every() to test if all elements in the collection return true based on fn. Omit the second argument, fn, to use Boolean as a default.
+>
+>翻译结果：
+>如果提供的谓词函数对集合中的所有元素返回true，则返回true，否则返回false。使用array .prototype. each()测试集合中的所有元素是否基于fn返回true。省略第二个参数fn，以使用布尔值作为默认值。
+```
+const all = (arr, fn = Boolean) => arr.every(fn);
+all([4, 2, 3], x => x > 1); // true
+all([1, 2, 3]); // true
+```
+以`all([4, 2, 3], x => x > 1);`为例进行解读：
+
+ 1. 使用every函数
+ 2. 这个函数传入了数组`[4, 2, 3]`，因为数组中的所有元素都满足`x => x > 1`，所以返回为true。
+
+#### allEqual函数
+>原文解释：
+>Check if all elements in an array are equal.Use Array.prototype.every() to check if all the elements of the array are the same as the first one.
+>
+>翻译结果：
+>检查数组中的所有元素是否相等。使用array .prototype.every()检查数组中的所有元素是否与第一个元素相同。
+```
+const allEqual = arr => arr.every(val => val === arr[0]);
+allEqual([1, 2, 3, 4, 5, 6]); // false
+allEqual([1, 1, 1, 1]); // true
+```
+以`allEqual([1, 2, 3, 4, 5, 6]);`为例进行解读：
+
+ 1. 使用了every函数，只有数组中所有元素都满足条件才返回true，否则返回false。
+ 2. 该函数出入了数组`[1, 2, 3, 4, 5, 6]`，如果所有数组元素的值和第一个数组元素的值相等的话代表数组中所有元素相等，将返回true，否则返回false。
+
+#### any函数
+>原文解释：
+>Returns true if the provided predicate function returns true for at least one element in a collection, false otherwise.Use Array.prototype.some() to test if any elements in the collection return true based on fn. Omit the second argument, fn, to use Boolean as a default.
+>
+>翻译结果：
+>如果提供的谓词函数对于集合中的至少一个元素返回true，则返回true，否则返回false。使用Array.prototype.some()测试集合中的元素是否基于fn返回true。省略第二个参数fn，以使用布尔值作为默认值。
+```
+const any = (arr, fn = Boolean) => arr.some(fn);
+any([0, 1, 2, 0], x => x >= 2); // true
+any([0, 0, 1, 0]); // true
+```
+以`any([0, 1, 2, 0], x => x >= 2);`为例进行解读：
+
+ 1. 使用了some函数
+ 2. 这个函数传入了数组`[0, 1, 2, 0]`和条件`x => x >= 2`，只要数组中存在大于等于2的值，那么这个函数就会返回true，如果不存在满足条件的元素，那么将返回false。
+
+#### arrayToCSV函数
+>原文解释：
+>Converts a 2D array to a comma-separated values (CSV) string.Use Array.prototype.map() and Array.prototype.join(delimiter) to combine individual 1D arrays (rows) into strings. Use Array.prototype.join('\n') to combine all rows into a CSV string, separating each row with a newline. Omit the second argument, delimiter, to use a default delimiter of ,.
+>
+>翻译结果：
+>将2D数组转换为逗号分隔值(CSV)字符串。使用Array.prototype.map()和Array.prototype.join(分隔符)将单个1D数组(行)组合成字符串。使用Array.prototype.join('\n')将所有行合并成CSV字符串，用换行符分隔每一行。省略第二个参数，分隔符，以使用默认的分隔符，。
+```
+const arrayToCSV = (arr, delimiter = ',') =>
+  arr.map(v => v.map(x => `"${x}"`).join(delimiter)).join('\n');
+arrayToCSV([['a', 'b'], ['c', 'd']]); // '"a","b"\n"c","d"'
+arrayToCSV([['a', 'b'], ['c', 'd']], ';'); // '"a";"b"\n"c";"d"'
+```
+以`arrayToCSV([['a', 'b'], ['c', 'd']], ';');`为例进行解读：
+
+ 1. 这个函数使用了map函数格式化了数组中的元素和join函数将数组转换成了字符串。
+ 2. 首先看到了函数表达式`v.map(x => `"${x}"`).join(delimiter)`将数组中的数组里面的每个元素格式化成了带有双引号的字符串，然后使用join函数将数组转换成了使用`;`分割的字符串。最后使用`\n`回车符将字符串数组转换成了带有回车符的字符串。
+
+#### bifurcate函数
+>原文解释：
+>Splits values into two groups. If an element in filter is truthy, the corresponding element in the collection belongs to the first group; otherwise, it belongs to the second group.Use Array.prototype.reduce() and Array.prototype.push() to add elements to groups, based on filter.
+>
+>翻译结果：
+>将值分成两组。如果filter中的元素是真实的，集合中的相应元素属于第一组;否则，它属于第二组。使用Array.prototype.reduce()和Array.prototype.push()根据filter向组添加元素。
+```
+const bifurcate = (arr, filter) =>
+  arr.reduce((acc, val, i) => (acc[filter[i] ? 0 : 1].push(val), acc), [[], []]);
+bifurcate(['beep', 'boop', 'foo', 'bar'], [true, true, false, true]); // [ ['beep', 'boop', 'bar'], ['foo'] ]
+```
+以`bifurcate(['beep', 'boop', 'foo', 'bar'], [true, true, false, true]);`为例进行解读分析：
+
+ 1. 该函数中传入了原数组`['beep', 'boop', 'foo', 'bar']`、布尔值数组`[true, true, false, true]`和求和的初始化参数`[[], []]`，首先看到函数表达式`acc[filter[i] ? 0 : 1]`，意思是根据布尔值`filter[i]`来决定使用第一个空数组还是第二个空数组。
+ 2. 然后使用了push函数将数组中的元素进行push分组，也就是遇到布尔值为true时将字符串放到第一个空数组中，当布尔值为false时，将字符串放到第二个空数组中，最后返回对应的acc数组。
+
+#### bifurcateBy函数
+>原文解释：
+>Splits values into two groups according to a predicate function, which specifies which group an element in the input collection belongs to. If the predicate function returns a truthy value, the collection element belongs to the first group; otherwise, it belongs to the second group.Use Array.prototype.reduce() and Array.prototype.push() to add elements to groups, based on the value returned by fn for each element.
+>
+>翻译结果：
+>根据谓词函数将值分成两组，谓词函数指定输入集合中的元素属于哪个组。如果谓词函数返回一个真值，则集合元素属于第一组;否则，它属于第二组。根据fn为每个元素返回的值，使用Array.prototype.reduce()和Array.prototype.push()向组添加元素。
+```
+const bifurcateBy = (arr, fn) =>
+  arr.reduce((acc, val, i) => (acc[fn(val, i) ? 0 : 1].push(val), acc), [[], []]);
+bifurcateBy(['beep', 'boop', 'foo', 'bar'], x => x[0] === 'b'); // [ ['beep', 'boop', 'bar'], ['foo'] ]
+```
+以`bifurcateBy(['beep', 'boop', 'foo', 'bar'], x => x[0] === 'b');`为例进行解读：
+
+ 1. 这个杉树使用了reduce求和函数、三元表达式和push函数。
+ 2. 首先看到函数表达式`acc[fn(val, i) ? 0 : 1]`和`x => x[0] === 'b'`，两者结合的意思是如果字符串数组的第一个元素是b的话就返回0，否则返回1。然后b字母开头的的字符串在第一个空数组中集合，不是b开头的话就在第二个空数组中集合，求和函数的目的是每次返回的数组都是最新更新后所得的。
+
 #### chunk函数
 >原文解释：
 >Chunks an array into smaller arrays of a specified size.Use Array.from() to create a new array, that fits the number of chunks that will be produced. Use Array.prototype.slice() to map each element of the new array to a chunk the length of size. If the original array can't be split evenly, the final chunk will contain the remaining elements.
@@ -16,7 +114,6 @@ chunk([1, 2, 3, 4, 5], 2); // [[1,2],[3,4],[5]]
 
  1. 该函数使用了Array.from函数创建数组对象和slice截取函数。
  2. 首先看到Array.from中`{ length: Math.ceil(arr.length / size) }`表明了一个维数组对象，意思是要创建一个长度为3的数组，`arr.slice(i * size, i * size + size)`这句话其实是：将数组中的每个数组元素创建为，从原数组中每截取两个元素组成新数组，将这些新数组变为数组元素然后返回。
-
 
 #### compact函数
 >原文解释：
