@@ -1,4 +1,99 @@
 ## 30 seconds of code中所有函数解读 (慢慢补充中...)
+#### drop函数
+>原文解释：
+>Returns a new array with n elements removed from the left.Use Array.prototype.slice() to slice the remove the specified number of elements from the left.
+>
+>翻译结果：
+>返回一个从左边移除n个元素的新数组。使用Array.prototype.slice()将从左侧删除指定数量的元素。
+```
+const drop = (arr, n = 1) => arr.slice(n);
+drop([1, 2, 3]); // [2,3]
+drop([1, 2, 3], 2); // [3]
+drop([1, 2, 3], 42); // []
+```
+以`drop([1, 2, 3], 2);`为例进行解读：
+
+ 1. 很容易明白数组`[1, 2, 3]`从索引为2开始截取得到数组`[3]`。
+
+#### dropRight函数
+>原文解释：
+>Returns a new array with n elements removed from the right.Use Array.prototype.slice() to slice the remove the specified number of elements from the right.
+>
+>翻译结果：
+>返回一个从右侧移除n个元素的新数组。使用Array.prototype.slice()从右侧删除指定的元素数量。
+```
+const dropRight = (arr, n = 1) => arr.slice(0, -n);
+dropRight([1, 2, 3]); // [1,2]
+dropRight([1, 2, 3], 2); // [1]
+dropRight([1, 2, 3], 42); // []
+```
+以`dropRight([1, 2, 3], 2);`为例进行解读：
+
+ 1. 这个函数非常简单就是倒着截取函数，倒着从索引为-2开始截取数组`[1, 2, 3]`可以得到数组`[1]`。
+
+#### dropRightWhile函数
+>原文解释：
+>Removes elements from the end of an array until the passed function returns true. Returns the remaining elements in the array.Loop through the array, using Array.prototype.slice() to drop the last element of the array until the returned value from the function is true. Returns the remaining elements.
+>
+>翻译结果：
+>从数组末尾删除元素，直到传递的函数返回true为止。返回数组中的其余元素。循环遍历数组，使用array .prototype.slice()删除数组的最后一个元素，直到函数返回的值为true。返回其余元素。
+```
+const dropRightWhile = (arr, func) => {
+  while (arr.length > 0 && !func(arr[arr.length - 1])) arr = arr.slice(0, -1);
+  return arr;
+};
+dropRightWhile([1, 2, 3, 4], n => n < 3); // [1, 2]
+```
+以`dropRightWhile([1, 2, 3, 4], n => n < 3);`为例进行解读：
+
+ 1. 该函数使用了while循环和条件判断截取掉了不符合条件的数组元素。
+ 2. 首先看条件`n => n < 3`和`!func(arr[arr.length - 1])`，可以得出结论只要`n >= 3`就会返回true截取数组，所以最后截取掉了数组中的3和4。
+
+#### dropWhile函数
+>原文解释：
+>Removes elements in an array until the passed function returns true. Returns the remaining elements in the array.Loop through the array, using Array.prototype.slice() to drop the first element of the array until the returned value from the function is true. Returns the remaining elements.
+>翻译结果：
+>删除数组中的元素，直到传递的函数返回true为止。返回数组中的其余元素。循环遍历数组，使用array .prototype.slice()删除数组的第一个元素，直到函数返回的值为true。返回其余元素。
+```
+const dropWhile = (arr, func) => {
+  while (arr.length > 0 && !func(arr[0])) arr = arr.slice(1);
+  return arr;
+};
+dropWhile([1, 2, 3, 4], n => n >= 3); // [3,4]
+```
+以`dropWhile([1, 2, 3, 4], n => n >= 3);`为例进行解读：
+
+ 1. 使用while循环和slice函数截取获得符合条件的数组元素，可以看到条件`n => n >= 3`和`!func(arr[0])`可以drop不符合条件的数组元素。显然1和2在`n => n >= 3`的条件下不成立，但是在`!func(arr[0])`的条件下成立，一旦条件成立就会执行slice函数进行截取，综上所述可知一共截取了两次数组，而且都是从第二个元素开始截取。
+
+#### everyNth函数
+>原文解释：
+>Returns every nth element in an array.Use Array.prototype.filter() to create a new array that contains every nth element of a given array.
+>翻译结果：
+>返回数组中的第n个元素。使用array. prototype.filter()创建一个包含给定数组的第n个元素的新数组。
+```
+const everyNth = (arr, nth) => arr.filter((e, i) => i % nth === nth - 1);
+everyNth([1, 2, 3, 4, 5, 6], 2); // [ 2, 4, 6 ]
+```
+以`everyNth([1, 2, 3, 4, 5, 6], 2);`为例进行解读：
+
+ 1. 使用条件回调方式过滤得到需要的数组元素，根据`i % nth === nth - 1`可知只有数组元素的索引值为奇数是才返回true，所以整个函数将返回数组索引的值为奇数的数组元素。
+
+#### filterNonUnique函数
+>原文解释：
+>Filters out the non-unique values in an array.Use Array.prototype.filter() for an array containing only the unique values.
+>
+>翻译结果：
+>过滤掉数组中的非唯一值。对于只包含唯一值的数组，使用array .prototype.filter()。
+```
+const filterNonUnique = arr => arr.filter(i => arr.indexOf(i) === arr.lastIndexOf(i));
+filterNonUnique([1, 2, 2, 3, 4, 4, 5]); // [1, 3, 5]
+```
+以`filterNonUnique([1, 2, 2, 3, 4, 4, 5]);`为例进行解读：
+
+ 1. 该函数使用了三个函数，filter函数、indexOf函数、lastIndexOf函数。
+ 2. lastIndexOf() 方法可返回一个指定的字符串值最后出现的位置，在一个字符串中的指定位置从后向前搜索。
+ 3. 这个函数其实很好理解，只返回数组中不重复的值，可以看得到这样一个判`arr.indexOf(i) === arr.lastIndexOf(i)`，如果数组中存在两个相同的值i，那么该值肯定返回false，只有当数组中的值唯一不重复时才返回true，因为无论从前向后数还是从后向前数都是一致的索引值。
+
 #### filterNonUniqueBy函数
 >原文解释：
 >Filters out the non-unique values in an array, based on a provided comparator function.Use Array.prototype.filter() and Array.prototype.every() for an array containing only the unique values, based on the comparator function, fn. The comparator function takes four arguments: the values of the two elements being compared and their indexes.
