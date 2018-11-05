@@ -1,4 +1,74 @@
 ## 30 seconds of code中所有函数解读 (慢慢补充中...)
+#### deepFlatten函数
+>原文解释：
+>Deep flattens an array.Use recursion. Use Array.prototype.concat() with an empty array ([]) and the spread operator (...) to flatten an array. Recursively flatten each element that is an array.
+>
+>翻译结果：
+>深度压平阵列。使用递归。使用array([])和spread操作符(…)来压平一个数组。递归地将数组中的每个元素压平。
+```
+const deepFlatten = arr => 
+  [].concat(...arr.map(v => (Array.isArray(v) ? deepFlatten(v) : v)));
+deepFlatten([1, [2], [[3], 4], 5]); // [1,2,3,4,5]
+```
+以`deepFlatten([1, [2], [[3], 4], 5]);`为例进行解读：
+
+ 1. 使用map函数格式化数组中的元素和Array.isArray来判断是否是数组
+ 2. 这里传入了数组`[1, [2], [[3], 4], 5]`，首先准备了空数组，然后使用`Array.isArray`函数进行判断，如果是数组就进行回调操作，也就是将数组中的数组一层一层剥离出来并处理成数组元素，不是数组的话那就是数组元素直接返回，最终使用concat函数将数组全部合并。
+
+#### difference函数
+>原文解释：
+>Returns the difference between two arrays.Create a Set from b, then use Array.prototype.filter() on a to only keep values not contained in b.
+>
+>翻译结果：
+>返回两个数组之间的差异。从b创建一个集合，然后在a上使用Array.prototype.filter()来保存不包含在b中的值。
+```
+const difference = (a, b) => {
+  const s = new Set(b);
+  return a.filter(x => !s.has(x));
+};
+difference([1, 2, 3], [1, 2, 4]); // [3]
+```
+以`difference([1, 2, 3], [1, 2, 4]);`为例进行解读：
+
+ 1. 该函数使用了new Set函数和filter函数比较出了两数组不同的值，并将过滤的数组中不存在于比较函数中的元素都过滤出来。
+ 2. 首先使用new Set函数进行数组去重，由于数组`[1, 2, 4]`本就没有重复所以保持不变。然后使用filter函数将数组`[1, 2, 3]`过滤出了数组`[1, 2, 4]`中不存在的元素。
+
+#### differenceBy函数
+>原文解释：
+>Returns the difference between two arrays, after applying the provided function to each array element of both.Create a Set by applying fn to each element in b, then use Array.prototype.filter() in combination with fn on a to only keep values not contained in the previously created set.
+>
+>翻译结果：
+>将提供的函数应用于两个数组的每个数组元素后，返回两个数组之间的差异。通过将fn应用到b中的每个元素来创建一个集合，然后在a上使用Array.prototype.filter()和fn结合使用，以保持之前创建的集合中不包含的值。
+```
+const differenceBy = (a, b, fn) => {
+  const s = new Set(b.map(fn));
+  return a.filter(x => !s.has(fn(x)));
+};
+differenceBy([2.1, 1.2], [2.3, 3.4], Math.floor); // [1.2]
+differenceBy([{ x: 2 }, { x: 1 }], [{ x: 1 }], v => v.x); // [ { x: 2 } ]
+```
+以`differenceBy([{ x: 2 }, { x: 1 }], [{ x: 1 }], v => v.x);`为例进行解读：
+
+ 1. 这个函数使用了new Set函数和map函数进行数组重组和去重，然后使用了filter函数过滤不符合要求的值。
+ 2. 首先看到函数`new Set(b.map(fn))`，`b.map(fn)`是将数组`[{ x: 1 }]`格式化成`[1]`，然后使用使用new Set函数将数组进行去重处理。接着使用函数`a.filter(x =>!s.has(fn(x)))`将数组`[{ x: 2 }, { x: 1 }]`中存在和数组`[1]`中元素值相同的项给过滤了。
+
+#### differenceWith函数
+>原文解释：
+>Filters out all values from an array for which the comparator function does not return true.Use Array.prototype.filter() and Array.prototype.findIndex() to find the appropriate values.
+>
+>翻译结果：
+>将比较器函数不返回true的数组中的所有值过滤掉。使用Array.prototype.filter()和Array.prototype.findIndex()查找合适的值。
+```
+const differenceWith = (arr, val, comp) => 
+  arr.filter(a => val.findIndex(b => comp(a, b)) === -1);
+differenceWith([1, 1.2, 1.5, 3, 0], [1.9, 3, 0], (a, b) => Math.round(a) === Math.round(b)); // [1, 1.2]
+```
+以`differenceWith([1, 1.2, 1.5, 3, 0], [1.9, 3, 0], (a, b) => Math.round(a) === Math.round(b));`为例进行解读：
+
+ 1. 该函数使用了filter函数、findIndex函数和Math.round函数
+ 2. 首先看`val.findIndex(b => comp(a, b)) === -1`函数，将该函数进行分解，看到`comp(a, b)`函数也就是`Math.round(a) === Math.round(b)`，这里的a和b分别来自两个数组`[1, 1.2, 1.5, 3, 0]`和`[1.9, 3, 0]`，将这两个数组中的元素都进行Math.round函数的处理可以发现只有元素1和1.2的Math.round结果在数组`[1.9, 3, 0]`的结果中不存在，也就是数组`[1, 1.2, 1.5, 3, 0]`的findIndex结果在循环到数组元素为1和1.2时返回结果为-1。
+ 3. 所以最后留下了符合条件的数组元素，也就是A数组元素4舍5入后在B数组元素4舍5入后不存在的元素都留了下来。
+
 #### drop函数
 >原文解释：
 >Returns a new array with n elements removed from the left.Use Array.prototype.slice() to slice the remove the specified number of elements from the left.
